@@ -267,6 +267,36 @@ Handlers.append(HandleStatusLED())
 
 
 ######################################################################
+# RS485 EN Functionality
+######################################################################
+
+class HandleRS485:
+    def __init__(self):
+        self.pin = None
+        self.ctr_dispatch = { 'DECL_RS485_PIN': self.decl_rs485_pin }
+    def decl_rs485_pin(self, req):
+        pin = req.split(None, 1)[1].strip()
+        if pin.startswith('"') and pin.endswith('"'):
+            pin = pin[1:-1].strip()
+        self.pin = pin
+    def generate_code(self, options):
+        rs485_gpio = rs485_gpio_high = 0
+        pin = self.pin
+        if pin:
+            rs485_gpio_high = 1
+            if pin[0] == "!":
+                rs485_gpio_high = 0
+                pin = pin[1:].strip()
+            rs485_gpio = HandlerConstants.lookup_pin(pin)
+        fmt = """
+uint32_t rs485_gpio = %d, rs485_gpio_high = %d; // "%s"
+"""
+        return fmt % (rs485_gpio, rs485_gpio_high, self.pin)
+
+Handlers.append(HandleRS485())
+
+
+######################################################################
 # Button entry functionality
 ######################################################################
 

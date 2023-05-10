@@ -110,6 +110,15 @@ config STATUS_LED_PIN
     string "Status LED GPIO Pin"
     depends on ENABLE_LED
 
+config ENABLE_RS485
+    bool "Enable RS485"
+    default n
+    depends on SERIAL
+
+config RS485_PIN
+    string "RS485 GPIO Pin"
+    depends on ENABLE_RS485
+
 config BUILD_DEPLOYER
     bool
     default y if FLASH_APPLICATION_ADDRESS != FLASH_BOOT_ADDRESS

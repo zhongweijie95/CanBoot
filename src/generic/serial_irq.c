@@ -10,9 +10,9 @@
 #include "board/irq.h" // irq_save
 #include "board/misc.h" // console_sendf
 #include "board/pgm.h" // READP
+#include "board/gpio.h" // gpio_out_setup
 #include "command.h" // DECL_CONSTANT
 #include "sched.h" // sched_wake_tasks
-#include "serial_irq.h" // serial_enable_tx_irq
 
 #define RX_BUFFER_SIZE 192
 

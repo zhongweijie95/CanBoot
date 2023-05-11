@@ -62,7 +62,6 @@ static struct gpio_out rs485;
 void
 USARTx_IRQHandler(void)
 {
-    static uint8_t empty;
     uint32_t sr = USARTx->SR;
     if (sr & (USART_SR_RXNE | USART_SR_ORE)) {
         // The ORE flag is automatically cleared by reading SR, followed
@@ -72,27 +71,27 @@ USARTx_IRQHandler(void)
     if (sr & USART_SR_TXE && USARTx->CR1 & USART_CR1_TXEIE) {
         uint8_t data;
         int ret = serial_get_tx_byte(&data);
-        if (ret) {
-            USARTx->CR1 = CR1_FLAGS;
-            empty = 1;      
+        if (ret < 0) {
+            USARTx->CR1 = CR1_FLAGS;  
         }
         else {
-            empty = 0;
+            gpio_out_write(rs485, rs485_gpio_high);
             USARTx->DR = data;
+            if(ret == 0)
+                USARTx->CR1 = CR1_FLAGS | USART_CR1_TCIE; 
         }
     }
     if (sr & USART_SR_TC) {
+        gpio_out_write(rs485, rs485_gpio_high==1?0:1);
         USARTx->SR = (uint16_t)~USART_SR_TC;
-        if ( empty == 1 )
-            gpio_out_write(rs485, rs485_gpio_high==1?0:1);
+        USARTx->CR1 = CR1_FLAGS;
     }
 }
 
 void
 serial_enable_tx_irq(void)
 {
-    gpio_out_write(rs485, rs485_gpio_high);
-    USARTx->CR1 = CR1_FLAGS | USART_CR1_TXEIE | USART_CR1_TCIE;
+    USARTx->CR1 = CR1_FLAGS | USART_CR1_TXEIE;
 }
 
 void

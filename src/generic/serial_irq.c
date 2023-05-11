@@ -37,11 +37,11 @@ serial_rx_byte(uint_fast8_t data)
 // Tx interrupt - get next byte to transmit
 int
 serial_get_tx_byte(uint8_t *pdata)
-{
+{  
     if (transmit_pos >= transmit_max)
         return -1;
     *pdata = transmit_buf[transmit_pos++];
-    return 0;
+    return transmit_max-transmit_pos;
 }
 
 // Remove from the receive buffer the given number of bytes

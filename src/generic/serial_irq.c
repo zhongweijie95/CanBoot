@@ -41,7 +41,11 @@ serial_get_tx_byte(uint8_t *pdata)
     if (transmit_pos >= transmit_max)
         return -1;
     *pdata = transmit_buf[transmit_pos++];
-    return transmit_max-transmit_pos;
+#if CONFIG_ENABLE_RS485    
+    return transmit_max - transmit_pos + 1;
+#else
+    return 0;
+#endif
 }
 
 // Remove from the receive buffer the given number of bytes
